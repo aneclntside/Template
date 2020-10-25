@@ -1,0 +1,7 @@
+{
+  "name": "PIM",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
