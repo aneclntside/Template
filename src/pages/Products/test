@@ -1,0 +1,112 @@
+/*
+
+        <IonPage>
+        <IonHeader>
+          <IonToolbar>
+            <IonButtons slot="start">
+              <IonMenuButton />
+            </IonButtons>
+            <IonTitle>Products</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+  
+        <IonContent fullscreen>
+{/*           <IonHeader collapse="condense">
+            <IonToolbar>
+              <IonTitle size="large">Test</IonTitle>
+            </IonToolbar>
+          </IonHeader> *///}
+    //      {/* <ExploreContainer name="Products" /> */}
+    //      </IonContent>
+    //      </IonPage>
+
+
+
+    /*
+    
+    const myFormFields: {
+  Header: globalStructre.IngressProps[];
+  Item: globalStructre.IngressProps[];
+} = {
+  Header: [
+    {
+      type: "Input",
+      name: "email",
+      attributes: { type: "email", maxlength: 16 },
+      label: "Email",
+    },
+    {
+      type: "Input",
+      name: "fullName",
+      attributes: { type: "text", maxlength: 26, required: true }, //properties
+      label: "Full Name",
+      rules: {},
+    },
+    {
+      type: "Input",
+      name: "password",
+      attributes: { type: "password", maxlength: 6 },
+      label: "Password",
+      rules: { required: true },
+    },
+    {
+      type: "Select",
+      name: "gender",
+      attributes: {},
+      label: "Gender",
+      rules: { required: true },
+      options: ["Male", "Female"],
+    },
+    {
+      type: "Textarea",
+      name: "description",
+      attributes: { type: "text", maxlength: 26, required: true }, //properties
+      label: "Description",
+      rules: { required: true },
+    },
+    {
+      type: "Toggle",
+      name: "agree",
+      attributes: { required: true }, //properties
+      label: "Agree",
+      rules: { required: true },
+    },
+    {
+      type: "Date",
+      name: "date",
+      attributes: {}, //properties
+      label: "Date",
+      rules: {},
+    },
+    {
+      type: "Radio",
+      name: "radio",
+      attributes: {},
+      label: "Manufacturers",
+      rules: { required: true },
+      options: ["Apple", "Microsoft"],
+    },
+    {
+      type: "Range",
+      name: "range",
+      attributes: {}, //properties
+      label: "Range",
+      rules: {},
+      rangeMin: -200,
+      rangeMax: 200,
+    },
+    {
+      type: "Checkbox",
+      name: "check",
+      attributes: { required: true }, //properties
+      label: "Check",
+      rules: { required: true },
+    },
+  ],
+  Item: [],
+};
+    
+    
+    
+    
+    */

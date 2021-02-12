@@ -1,0 +1,154 @@
+import * as actionTypes from "../actions/actionTypes";
+import { updateObject } from "../../shared/utility";
+
+const intialState = {
+  attributes: [],
+  tempAttributes: []
+};
+
+const addAttribute = (state, action) => {
+
+
+
+
+
+
+
+
+
+/*   return updateObject(state, {
+    attributes: state.attributes.concat(action.payload),
+  }); 
+
+
+    attributes: [{
+    businessObject: {
+    groupName: [
+      {
+        attName: string,
+        attValue: string,
+        touched: string,
+        elementType: string,
+        elementConfig: {},
+        validation: {
+          unique: string
+        }
+
+      }
+    ]
+}
+  }]
+*/
+/* 
+  const updatedState = {...state};
+  const updatedAttributes = [...updatedState.attributes];
+  const updateElementConfig = action.payload.elementConfig;
+  const updateValidation = action.payload.validation;
+  const newAttribute = {
+    attName: action.payload.name,
+    attValue: action.payload.value,
+    touched: action.payload.touched,
+    elementType: action.payload.elementType,
+    elementConfig: updateElementConfig,
+    validation: updateValidation
+  };    
+  if (updatedAttributes.length === 0){
+      const newGroup = [];
+      newGroup.push(newAttribute);
+      action.payload.businessObject.map(businessOB => {
+            const businessObject = {
+                [businessOB]: {
+                    [action.payload.group]: newGroup
+                }
+            }
+            updatedAttributes.push(businessObject);
+      });
+      updatedState.attributes = updatedAttributes;
+
+      // temp updating the data for temAttributes
+      const UpdatedTempAttributes = [...updatedState.tempAttributes];
+      UpdatedTempAttributes.push(action.payload);
+     // console.log(UpdatedTempAttributes);
+      updatedState.tempAttributes = UpdatedTempAttributes;
+      
+
+      // end of temp changes
+
+      return (updatedState);
+
+  }
+  else{ */
+
+    // test
+/*  
+    //loop through given Business Objects 
+action.payload.businessObject.map(businessOB => {
+    // find business Objects
+    const busObjectIndex = updatedAttributes.findIndex(
+        busObject => Object.keys(busObject)[0] === businessOB
+    );
+    if (busObjectIndex >= 0){
+        //Business Object Exists
+    const updateBO = updatedAttributes[busObjectIndex];
+    const updateGroup = Object.keys(updateBO)
+                            .map( groupName => {
+
+                            });
+
+    }
+    else{
+        //Business Object Does Not Exists
+
+    }
+
+
+}); */
+
+//test end
+
+
+
+ // }
+
+
+};
+
+const editAttribute = (state, action) => {
+    
+
+/*     const updatedState = {...state};
+    console.log(updatedState);
+    const updatedAttArray = {...state.attributes};
+    const updatedAttIndex = Object.keys(updatedAttArray)
+                                .filter(attribute => updatedAttArray[attribute].name ===  action.payload.name);
+    const updatedAttribute = updatedAttArray[updatedAttIndex];
+    const updatedElementConfig = {...updatedAttribute.elementConfig};
+    const updatedConfig = updateObject(updatedElementConfig, action.payload.elementConfig);
+    const updateAttribute = updateObject(updatedAttribute, action.payload);
+    updateAttribute.elementConfig = updatedConfig;
+    updatedAttArray[updatedAttIndex] = updateAttribute;
+    updatedState.attributes = updatedAttArray;
+    console.log(updatedState)
+    return updatedState; 
+    return state;*/
+  };
+
+const initAttribute = () => {
+  return intialState;
+};
+
+const reducer = (state = intialState, action) => {
+  switch (action.type) {
+    case actionTypes.INIT_ATTRIBUTE:
+      return initAttribute();
+    case actionTypes.ADD_ATTRIBUTE:
+      return addAttribute(state, action);
+    case actionTypes.EDIT_ATTRIBUTE:
+      return editAttribute(state, action);
+
+    default:
+      return state;
+  }
+};
+
+export default reducer;

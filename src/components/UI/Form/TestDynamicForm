@@ -1,0 +1,521 @@
+import {
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonPage,
+  IonRow,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
+import React, { useRef } from "react";
+import "./Form.css";
+import { useFieldArray, useForm } from "react-hook-form";
+import * as globalStructre from "../Components/Content";
+import Footer from "../Footer/Footer";
+import Header from "../Header/Header";
+import {UtilBuildHeader,UtilBuildForm} from './FormUtil';
+import Input from "../Components/Input";
+import Textarea from "../Components/Textarea";
+import Toggle from "../Components/Toggle";
+import Select from "../Components/Select";
+import Radio from "../Components/Radio";
+import Checkbox from "../Components/Checkbox";
+import Range from "../Components/Range";
+import Date from "../Components/Date";
+
+interface FormProps {
+  title: string;
+  defaultFieldValues?: {};
+  formFields: globalStructre.FormProps;
+  edit?: boolean;
+  operation: string;
+  menu: boolean;
+  validate?: boolean;
+  onSubmit?: (formDetails: any) => void;
+  onSetCallingState?: (data: boolean) => void;
+}
+
+const DynamicForm: React.FC<FormProps> = (props) => {
+  const formRef = useRef<HTMLFormElement>(null);
+  const {
+    title,
+    defaultFieldValues,
+    formFields,
+    edit,
+    operation,
+    menu,
+    validate,
+    onSubmit,
+    onSetCallingState,
+  } = props;
+  const methods = useForm({
+    defaultValues: { ...defaultFieldValues },
+    mode: "onChange",
+  });
+  const { control, handleSubmit, errors, reset, formState } = methods;
+/*   const { control, handleSubmit, errors, reset, formState, register } = useForm({
+    defaultValues: { ...defaultFieldValues },
+    mode: "onChange",
+  }); */
+  const { fields, append, remove  } = useFieldArray({
+    control,
+    name: "data"
+  });
+  let trigger: any = null;
+  let myForm:any = null;
+
+  // user authorizaiton to edit, replace edit with operation, range set default value, segmentation -  add button to groups, items list and popup as seperate component
+
+  const onReset = () => {
+    reset(defaultFieldValues);
+  };
+
+  const registerButtonSubmit = (data: any) => {
+    console.log("creating a new user account with: ", data);
+    if (onSubmit && trigger) {
+      data.action = "submit";
+      onSubmit(data);
+      reset(data);
+    } else if (onSubmit && !trigger) {
+      data.action = "validate";
+      onSubmit(data);
+    }
+  };
+
+  const submitForm = (flag: boolean) => {
+    console.log("inside submit form");
+    myForm.dispatchEvent(new Event('Submit'));
+    //Check if requestSubmit() is available to current browser
+/*     if (formRef!.current!.requestSubmit) {
+      console.log("inside submit form - first if");
+      trigger = flag;
+      formRef!.current!.requestSubmit();
+    } */
+    //If not, perform constraint validation and call submit function directly
+/*     else {
+      console.log("inside submit form else");
+      if (formRef!.current!.reportValidity()) {
+        console.log("inside submit form second if");
+        handleSubmit(registerButtonSubmit);
+      }
+    } */
+  };
+
+
+  const buildHeader = (attributes:globalStructre.IngressProps[]) => {
+
+    return attributes.map(
+       (field: any, index: any) => {
+         return (
+           <IonCol
+             size="12"
+             size-md="4"
+             key={field.name + index}
+           >
+             {buildForm(field, field.name + index)}
+           </IonCol>
+         );
+       }
+     )
+ 
+   }; 
+ 
+ 
+ 
+ 
+    const buildForm = (field: globalStructre.IngressProps, ind: any) => {
+     let inputElement = null;
+     switch (field.type) {
+       case "Input":
+         inputElement = (
+           <Input
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+           />
+         );
+         break;
+       case "Textarea":
+         inputElement = (
+           <Textarea
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+           />
+         );
+         break;
+       case "Toggle":
+         inputElement = (
+           <Toggle
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+           />
+         );
+         break;
+       case "Date":
+         inputElement = (
+           <Date
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+           />
+         );
+         break;
+       case "Select":
+         inputElement = (
+           <Select
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+             options={field.options}
+           />
+         );
+         break;
+       case "Radio":
+         inputElement = (
+           <Radio
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+             options={field.options}
+           />
+         );
+         break;
+       case "Range":
+         inputElement = (
+           <Range
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+             rangeMin={field.rangeMin}
+             rangeMax={field.rangeMax}
+           />
+         );
+         break;
+       case "Checkbox":
+         inputElement = (
+           <Checkbox
+             key={ind}
+             name={field.name}
+             control={control}
+             attributes={field.attributes}
+             label={field.label}
+             rules={field.rules}
+             errors={errors}
+           />
+         );
+         break;
+     }
+ 
+     return inputElement;
+   };
+ 
+
+
+
+
+  const buildFieldElements = (
+    buildFields: any,
+    data: any,
+    index: any,
+  ) => {
+    let formElements = [];
+    buildFields.map((field: any, ind: any) => {
+      //  field.defaultValue = data[field.name];
+      //  field.name = `${fieldsName}[${index}].${field.name}`;
+      //  formElement = buildForm(field, ind, control, errors);
+      //  formElements.push(buildElement("Input",data,index));
+      formElements.push(UtilBuildForm(field, ind, control, errors));
+    });
+    formElements.push(
+      <IonItem>
+        <IonButton type="button" onClick={() => remove(index)}>
+          Delete
+        </IonButton>
+      </IonItem>
+    );
+    return <IonItem key={data.id}>{formElements}</IonItem>;
+  };
+  
+const buildGroup = ( group: any ) => {
+    if (!group.groupMultiple) {
+      return (
+        <IonCard>
+          <IonCardHeader className="ion-float-right">
+            {group.groupName}
+          </IonCardHeader>
+          <IonCardContent>
+            <IonRow>
+              {UtilBuildHeader(group.groupAttributes, control, errors)}
+            </IonRow>
+          </IonCardContent>
+        </IonCard>
+      );
+    } else if (group.groupMultiple) {
+      console.log("inside group multiple");
+      //  return (  <FormArray formArrayFields={group.groupAttributes} control={control} register={register} errors={errors} arrayName={"price"} />
+/*       return (
+        <IonCard>
+          <IonCardHeader className="ion-float-right">
+            <IonToolbar>
+              <IonButtons>
+                <IonButton
+                  type="button"
+                  onClick={() => {
+                    console.log("inside append");
+                    append({});
+                  }}
+                >
+                  append
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonCardHeader>
+          <IonCardContent>
+            <IonRow>
+              {fields.map((data: any, index: any) =>
+                buildFieldElements(group.groupAttributes, data, index)
+              )}
+            </IonRow>
+          </IonCardContent>
+        </IonCard>
+      ); */
+    }
+  };  
+
+  console.log("rendering...");
+  return (
+    <IonPage>
+      <Header
+        title={title}
+        operation={operation}
+        menu={menu}
+        onResetModal={(data) => {
+          if (onSetCallingState) onSetCallingState(data);
+        }}
+      />
+      <IonContent fullscreen>
+        <div className="ion-padding">
+          <form onSubmit={handleSubmit(registerButtonSubmit)} ref={(formRef) => myForm = formRef}>
+            {/* {formFields.Header.map((field, index) => buildForm(field, index))} */}
+            <IonGrid>
+              <IonTitle className="ion-text-center">{formFields.uniqueName}</IonTitle>
+              <IonRow>
+                <IonCol size-sm="8" offset-sm="2" size-md="10" offset-md="1">
+                  <IonGrid>
+                    {formFields.Header.map((group: any) => {
+                    //   return buildGroup(group);
+                      return (
+                        <IonCard>
+                          <IonCardHeader className="ion-float-right">{group.groupName}</IonCardHeader>
+                          <IonCardContent>
+                            <IonRow>
+                            {/* {UtilBuildHeader(group.groupAttributes,control,errors)} */}
+                              {buildHeader(group.groupAttributes)}
+                            </IonRow>
+                          </IonCardContent>
+                        </IonCard>
+                      );
+                    })}
+                  </IonGrid>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </form>
+        </div>
+      </IonContent>
+      <Footer
+        edit={edit ? edit : false}
+        onSubmitHandler={() => submitForm(true)}
+        onValidateHandler={() => submitForm(false)}
+        onResetHandler={onReset}
+        dirty={Object.keys(formState.dirtyFields).length > 0}
+        validate={validate ? validate : true}
+      />
+    </IonPage>
+  );
+};
+
+export default DynamicForm;
+
+
+/**
+  const buildHeader = (attributes:globalStructre.IngressProps[]) => {
+
+   return attributes.map(
+      (field: any, index: any) => {
+        return (
+          <IonCol
+            size="12"
+            size-md="4"
+            key={field.name + index}
+          >
+            {buildForm(field, field.name + index)}
+          </IonCol>
+        );
+      }
+    )
+
+  }; 
+
+
+
+
+   const buildForm = (field: globalStructre.IngressProps, ind: any) => {
+    let inputElement = null;
+    switch (field.type) {
+      case "Input":
+        inputElement = (
+          <Input
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            onInput={(e) => handleInput(e)}
+          />
+        );
+        break;
+      case "Textarea":
+        inputElement = (
+          <Textarea
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+      case "Toggle":
+        inputElement = (
+          <Toggle
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+      case "Date":
+        inputElement = (
+          <Date
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+      case "Select":
+        inputElement = (
+          <Select
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            options={field.options}
+          />
+        );
+        break;
+      case "Radio":
+        inputElement = (
+          <Radio
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            options={field.options}
+          />
+        );
+        break;
+      case "Range":
+        inputElement = (
+          <Range
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            rangeMin={field.rangeMin}
+            rangeMax={field.rangeMax}
+          />
+        );
+        break;
+      case "Checkbox":
+        inputElement = (
+          <Checkbox
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+    }
+
+    return inputElement;
+  };
+
+
+
+
+ */

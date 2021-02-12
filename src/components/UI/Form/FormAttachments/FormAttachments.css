@@ -1,0 +1,91 @@
+.image-preview {
+  width: 100px;
+  max-width: 100%;
+  height: 100px;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.image-preview h3 {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: inline-block;
+}
+
+.imgDiv img:hover {
+  -webkit-filter: blur(2px);
+  -moz-filter: blur(2px);
+  -o-filter: blur(2px);
+  -ms-filter: blur(2px);
+  filter: blur(2px);
+}
+
+.imgDiv ion-button {
+  -webkit-filter: blur(0px);
+  -moz-filter: blur(0px);
+  -o-filter: blur(0px);
+  -ms-filter: blur(8px);
+  filter: blur(0px);
+  z-index: 9999;
+}
+
+.attachments {
+  background-color: #f7f7f7;
+  border: solid 1px primary;
+  padding: 10px;
+}
+
+/*   #inner1 {
+    float:left; 
+ }
+ 
+ #inner2{
+    float:left; 
+    clear: left;
+ } */
+
+#wrapper {
+  margin-left: auto;
+  margin-right: auto;
+  height: auto;
+  width: auto;
+}
+
+#wrapper ion-button {
+  margin: 0px;
+  height: 50%;
+  text-transform: none;
+}
+
+#wrapper #imageDelete {
+  font-size: 0.5rem;
+  font-weight: normal;
+  position: absolute;
+  top: calc(50% - 80px);
+  left: calc(50% - -21px);
+  font-size: 10px;
+}
+
+#attButton {
+  margin: auto;
+  height: 20px;
+  padding-bottom: 10px;
+}
+
+.item-content {
+  font-size: inherit;
+  color: #444;
+}
+
+#dragNdrop {
+  margin: 0px;
+}

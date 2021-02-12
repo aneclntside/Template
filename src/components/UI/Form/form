@@ -1,0 +1,196 @@
+import { IonContent, IonPage, IonText } from "@ionic/react";
+import React from "react";
+import "./Form.css";
+import { useForm } from "react-hook-form";
+import * as globalStructre from "../Components/Content";
+import Input from "../Components/Input";
+import Date from "../Components/Date";
+import Select from "../Components/Select";
+import Textarea from "../Components/Textarea";
+import Toggle from "../Components/Toggle";
+import Radio from "../Components/Radio";
+import Range from "../Components/Range";
+import Checkbox from "../Components/Checkbox";
+import Footer from "../Footer/Footer";
+
+interface FormProps {
+  title?:string;  
+  defaultFieldValues?: {};
+  formFields:{Header:globalStructre.IngressProps[], Item:globalStructre.IngressProps[]};
+  onSubmit?: (formDetails: any) => void;
+  edit?: boolean;
+}
+
+const Form: React.FC<FormProps> = (props) => {
+  const { title, defaultFieldValues, formFields, onSubmit, edit } = props;
+  const { control, handleSubmit, errors, reset } = useForm({
+    defaultValues: { ...defaultFieldValues },
+    mode: "onChange",
+  });
+
+  //  button, segmentation
+
+  const onReset = () => {
+    reset(defaultFieldValues);
+  };
+
+  const registerUser = (data: any) => {
+    console.log("creating a new user account with: ", data);
+    if(onSubmit){
+        onSubmit(data);
+    }
+  };
+
+  const handleInput = (event: any) => {
+    console.log("inside input");
+    console.log(event.target.value);
+  };
+
+  const buildForm = (field: globalStructre.IngressProps, ind: any) => {
+    let inputElement = null;
+    switch (field.type) {
+      case "Input":
+        inputElement = (
+          <Input
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            onInput={(e) => handleInput(e)}
+          />
+        );
+        break;
+      case "Textarea":
+        inputElement = (
+          <Textarea
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+      case "Toggle":
+        inputElement = (
+          <Toggle
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+      case "Date":
+        inputElement = (
+          <Date
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+      case "Select":
+        inputElement = (
+          <Select
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            options={field.options}
+          />
+        );
+        break;
+      case "Radio":
+        inputElement = (
+          <Radio
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            options={field.options}
+          />
+        );
+        break;
+      case "Range":
+        inputElement = (
+          <Range
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+            rangeMin={field.rangeMin}
+            rangeMax={field.rangeMax}
+          />
+        );
+        break;
+      case "Checkbox":
+        inputElement = (
+          <Checkbox
+            key={ind}
+            name={field.name}
+            control={control}
+            attributes={field.attributes}
+            label={field.label}
+            rules={field.rules}
+            errors={errors}
+          />
+        );
+        break;
+    }
+
+    return inputElement;
+  };
+  return (
+    <IonPage>
+      <IonContent>
+        <div className="ion-padding">
+          <IonText color="muted">
+            <h2>{title ? title : "Create"}</h2>
+          </IonText>
+          <form onSubmit={handleSubmit(registerUser)}>
+            {formFields.Header.map((field, index) => buildForm(field, index))}
+
+            {/*             <IonButton
+              type="button"
+              expand="block"
+              className="ion-margin-top"
+              onClick={() => {
+                reset(initialValues);
+              }}
+            >
+              Reset
+            </IonButton>
+            <IonButton expand="block" type="submit" className="ion-margin-top">
+              Register
+            </IonButton> */}
+          </form>
+        </div>
+      </IonContent>
+      <Footer edit={edit ? edit : false} onSubmitHandler={handleSubmit(registerUser)} onResetHandler={onReset} />
+    </IonPage>
+  );
+};
+
+export default Form;

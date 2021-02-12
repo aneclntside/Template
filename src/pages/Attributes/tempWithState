@@ -1,0 +1,359 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { connect } from "react-redux";
+import * as actions from "../../store/actions/index";
+import {
+  IonHeader,
+  IonContent,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBackButton,
+  IonPage,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonCard,
+  IonMenuButton,
+  IonButton,
+  IonFooter,
+  IonToast,
+} from "@ionic/react";
+import "./AddAttributes.css";
+import * as dynamicContent from "../../components/AddAttributes/DynamicContent";
+import DyanmicFields from "../../components/AddAttributes/DynamicFields/DynamicFields";
+import {
+  updateObject,
+  upsert,
+  editObject,
+  convertDynamicFields,
+} from "../../shared/utility";
+import { isUndefined } from "util";
+
+const AddAttributes: React.FC<dynamicContent.Props> = (props) => {
+  const [selectedOption, setSelectedOption] = useState() as any;
+  const [attribute, setAttribute] = useState<dynamicContent.FIELD_STRUCTURES>();
+  const attributeFrom = dynamicContent;
+  const FormRef: React.Ref<HTMLFormElement> = null;
+  const editFlag = props.history?.location?.state?.editAttribute;
+  let attributeValue: any = null;
+  let updateElementConfig: { fieldName: any; fieldValue: any }[] = [];
+  const {attributes, submitted, error, onAddAttribute, onEditAttribute, history} = props;
+
+console.log("Rendering - Add Attribute");
+
+  const _setEditAttribute = () => {
+    const attributeList: any = props.attributes ? props.attributes : [];
+    attributeValue = attributeList.find(
+      (att: any) => att.id === props.history?.location?.state?.data
+    );
+    if (attributeValue) {
+      setAttribute(attributeValue);
+      const eleentTypeValue = attributeValue.elementType;
+      let dynamicFields: any = {...attributeFrom.DYNAMIC_FIELDS};
+      let fieldObject = {...dynamicFields[eleentTypeValue]};
+      convertDynamicFields(
+        [...attributeValue.elementConfigs],
+        fieldObject
+      );
+      setSelectedOption(fieldObject);
+    }
+  };
+
+  const onSaveHanler = (event: any) => {
+    event.preventDefault();
+    if (editFlag) {
+      console.log("edit");
+      const updatedAttribute = editObject(attribute);
+      props.onEditAttribute(updatedAttribute);
+    } else {
+      console.log("create");
+      props.onAddAttribute(attribute);
+      setSelectedOption();
+      setAttribute(dynamicContent.FIELD_STRUCTURE);
+      props.updateAttributeScreen(true);
+    }
+  };
+
+  const onClearHandler = () => {
+    if(editFlag){
+      setSelectedOption();
+    }else{
+      setSelectedOption();
+      setAttribute(dynamicContent.FIELD_STRUCTURE);
+    }
+  };
+
+  const onInputChangeHandler = (event: any, inputIdentifier: string) => {
+    const value =
+      "checked" in event.target
+        ? event.target.checked
+        : event.target.value.trim();
+    setAttribute((prev:dynamicContent.FIELD_STRUCTURES | undefined) => {
+      if (prev !== undefined) {
+      if (prev!.elementConfigs!.length > 0) {
+        updateElementConfig = [...prev!.elementConfigs];
+        upsert(updateElementConfig, {
+          fieldName: inputIdentifier,
+          fieldValue: value,
+        });
+      } else {
+        updateElementConfig.push({
+          fieldName: inputIdentifier,
+          fieldValue: value,
+        });
+      }
+    }
+      const updatedElementConfig = {
+        elementConfigs: updateElementConfig,
+      };
+      const updateFeilds = updateObject(prev, updatedElementConfig);
+      return updateFeilds;
+    });
+  };
+
+  const onInputChangeHandler2 = (event: any, inputIdentifier: string) => {
+    setAttribute((prev) => {
+      const updatedAttribute = updateObject(prev, {
+        [inputIdentifier]: event.target.value,
+      });
+      return updatedAttribute;
+    });
+  };
+
+  const getBusinessObjects = () => {
+    const inputElement = (
+      <IonSelect
+        interface="popover"
+        multiple
+        onIonChange={(event: any) => getValues(event, "businessObjects")}
+        value={attribute?.businessObjects}
+      >
+        {Object.entries(attributeFrom.DYNAMIC_BO).map((inputKey, id) => {
+          const [name] = inputKey;
+          return (
+            <IonSelectOption key={id} value={name}>
+              {name}
+            </IonSelectOption>
+          );
+        })}
+      </IonSelect>
+    );
+    return inputElement;
+  };
+
+  const getValues = (event: any, inputIdentifier: string) => {
+    setAttribute((prev) => {
+      const updatedAttribute = updateObject(prev, {
+        [inputIdentifier]: event.target.value,
+      });
+      return updatedAttribute;
+    });
+  };
+
+  const getOptions = () => {
+    const fieldOptions = {...attributeFrom.DYNAMIC_FIELDS};
+    const inputElement = (
+      <IonSelect
+        interface="popover"
+        disabled={!props.addAttribute}
+        onIonChange={(event: any) => getFields(event)}
+        value={attribute?.elementType}
+      >
+        {Object.entries(fieldOptions).map((inputKey, id) => {
+          const [name] = inputKey;
+          return (
+            <IonSelectOption key={id} value={name}>
+              {name}
+            </IonSelectOption>
+          );
+        })}
+      </IonSelect>
+    );
+    return inputElement;
+  };
+
+  const getFields = (event: any) => {
+    if (!attributeValue) {
+      console.log("inside edit update attribute value");
+      const fieldObject: any = {...attributeFrom.DYNAMIC_FIELDS};
+      let fieldValue = event.target.value;
+      let selectedValues = {...fieldObject[fieldValue]}
+      setAttribute((prev) => {
+        const updatedAttribute = updateObject(prev, {
+          elementType: event.target.value,
+          elementConfigs: [],
+          validations: [],
+        });
+        return updatedAttribute;
+      });
+      setSelectedOption(selectedValues);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Component Load - Inside AddAttributes");
+    if (editFlag) {
+      _setEditAttribute();
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("Component Update - Inside AddAttributes");
+    console.log(attribute);
+    console.log(selectedOption);
+
+  });
+
+  return (
+    <React.Fragment>
+      <IonToast
+        isOpen={!!submitted}
+        message={submitted}
+        duration={2000}
+      />
+      <form ref={FormRef} onSubmit={onSaveHanler}>
+        <IonPage>
+          <IonHeader>
+            <IonToolbar>
+              <IonButtons slot="start">
+                <IonMenuButton />
+              </IonButtons>
+              <IonTitle>
+                {!props.addAttribute ? "Edit" : "Add"} Attributes
+              </IonTitle>
+              <IonButtons slot="end">
+                {props.addAttribute ? (
+                  <IonButton
+                    fill="clear"
+                    color="warning"
+                    onClick={() => props.updateAttributeScreen(false)}
+                  >
+                    Close
+                  </IonButton>
+                ) : (
+                  <IonBackButton />
+                )}
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonGrid>
+              <IonRow>
+                <IonCol size-sm="8" offset-sm="2" size-md="10" offset-md="1">
+                  <IonGrid>
+                    <IonCard>
+                      <IonRow>
+                        <IonCol>
+                          <IonItem>
+                            <IonLabel position="floating">
+                              Attribute Name
+                            </IonLabel>
+                            <IonInput
+                              key="attributeName"
+                              type="text"
+                              required
+                              disabled={!props.addAttribute}
+                              placeholder="Enter Field Name"
+                              onIonChange={(event) =>
+                                onInputChangeHandler2(event, "attName")
+                              }
+                              value={attribute?.attName}
+                            />
+                          </IonItem>
+                        </IonCol>
+                        <IonCol>
+                          <IonItem>
+                            <IonLabel position="floating">
+                              Attribute Group
+                            </IonLabel>
+                            <IonInput
+                              key="attributeGroup"
+                              required
+                              disabled={!props.addAttribute}
+                              onIonChange={(event) =>
+                                onInputChangeHandler2(event, "groupName")
+                              }
+                              value={attribute?.groupName}
+                            />
+                          </IonItem>
+                        </IonCol>
+                      </IonRow>
+                      <IonRow>
+                        <IonCol>
+                          <IonItem>
+                            <IonLabel position="floating">
+                              Business Object
+                            </IonLabel>
+                            {getBusinessObjects()}
+                          </IonItem>
+                        </IonCol>
+                        <IonCol>
+                          <IonItem>
+                            <IonLabel position="floating">Type</IonLabel>
+                            {getOptions()}
+                          </IonItem>
+                        </IonCol>
+                      </IonRow>
+                    </IonCard>
+                    {selectedOption && (
+                      <DyanmicFields
+                        selectedOption={selectedOption}
+                        onChangeHandler={(event, id) =>
+                          onInputChangeHandler(event, id)
+                        }
+                      />
+                    )}
+                  </IonGrid>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonContent>
+          <IonFooter>
+            <IonToolbar>
+              <IonButtons slot="end">
+                <IonButton
+                  color="warning"
+                  fill="clear"
+                  onClick={onClearHandler}
+                >
+                  Clear
+                </IonButton>
+                {/* <IonButton color="success" fill="solid" onClick={onSaveHanler}> */}
+                <IonButton color="success" fill="solid" type="submit">
+                  {!props.addAttribute ? "Update" : "Save"}
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonFooter>
+        </IonPage>
+      </form>
+    </React.Fragment>
+  );
+};
+
+const mapStateToProps = (state: any) => {
+  return {
+    attributes: state.attribute?.attributes,
+    submitted: state.attribute?.submitted,
+    error: state.attribute?.submitError,
+  };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    onAddAttribute: (attDetails: any) =>
+      dispatch(actions.addAttribute(attDetails, "token")),
+    onEditAttribute: (attDetails: any) =>
+      dispatch(actions.editAttribute(attDetails, "token")),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(React.memo(AddAttributes, (prevProps, nextProps) => true));

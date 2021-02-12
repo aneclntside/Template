@@ -1,0 +1,234 @@
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
+import * as actions from "../../store/actions/index";
+import {
+  IonHeader,
+  IonContent,
+  IonToolbar,
+  IonTitle,
+  IonButtons,
+  IonBackButton,
+  IonPage,
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonSelect,
+  IonSelectOption,
+  IonCard,
+  IonMenuButton,
+  IonButton,
+  IonFooter,
+} from "@ionic/react";
+import "./AddAttributes.css";
+import * as dynamicFields from "../../components/AddAttributes/DynamicContent";
+import DyanmicFields from "../../components/AddAttributes/DynamicFields/DynamicFields";
+import { updateObject } from "../../store/utility";
+
+const AddAttributes: React.FC<dynamicFields.Props> = (props) => {
+  const [selectedOption, setSelectedOption] = useState() as any;
+  const [attribute, setAttribute] = useState<dynamicFields.FIELD_STRUCTURES>(
+    dynamicFields.FIELD_STRUCTURE
+  );
+  const attributeFrom = dynamicFields;
+  const FormRef: React.Ref<HTMLFormElement> = null;
+
+  const onSaveHanler = (event: any) => {
+    event.preventDefault();
+    props.onAddAttribute(attribute);
+    setSelectedOption();
+    setAttribute(dynamicFields.FIELD_STRUCTURE);
+    if(props.show ){props.updateAttributeScreen();}
+    
+  };
+
+  const onClearHandler = () => {
+    setSelectedOption();
+    setAttribute(dynamicFields.FIELD_STRUCTURE);
+  };
+
+  const onInputChangeHandler = (event: any, inputIdentifier: string) => {
+    const value =
+      "checked" in event.target
+        ? event.target.checked
+        : event.target.value.trim();
+    setAttribute((prev) => {
+      const updatedElementConfig = {
+        elementConfig: updateObject(prev.elementConfig, {
+          [inputIdentifier]: value,
+        }),
+      };
+      const updateFeilds = updateObject(prev, updatedElementConfig);
+      return updateFeilds;
+    });
+  };
+
+  const onInputChangeHandler2 = (event: any, inputIdentifier: string) => {
+    setAttribute((prev) => {
+      const updatedAttribute = updateObject(prev, {
+        [inputIdentifier]: event.target.value,
+      });
+      return updatedAttribute;
+    });
+  };
+
+  const getOptions = () => {
+    const inputElement = (
+      <IonSelect
+        interface="popover"
+        onIonChange={(event: any) => getFields(event)}
+        value={attribute.elementType}
+      >
+        {Object.entries(attributeFrom.DYNAMIC_FIELDS).map((inputKey, id) => {
+          const [name] = inputKey;
+          return (
+            <IonSelectOption key={id} value={name}>
+              {name}
+            </IonSelectOption>
+          );
+        })}
+      </IonSelect>
+    );
+    return inputElement;
+  };
+
+  const getFields = (event: any) => {
+    const fieldObject: any = attributeFrom.DYNAMIC_FIELDS;
+    const fieldValue = event.target.value;
+    setAttribute((prev) => {
+      const updatedAttribute = updateObject(prev, {
+        elementType: event.target.value,
+        elementConfig: {},
+      });
+      return updatedAttribute;
+    });
+    setSelectedOption(fieldObject[fieldValue]);
+  };
+
+  useEffect(() => {
+    console.log("Component Load - Inside AddAttributes");
+    console.log(props.attribute);
+  },[]);
+
+  return (
+    <form ref={FormRef} onSubmit={onSaveHanler}>
+      <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonButtons slot="start">
+            <IonMenuButton />
+          </IonButtons>
+          <IonTitle>{props.attribute ? 'Edit' : 'Add'} Attributes</IonTitle>
+          <IonButtons slot="end">            
+            {props.show ? (
+              <IonButton
+                fill="clear" color="warning"
+                onClick={() => props.updateAttributeScreen()}
+              >
+                Close
+              </IonButton>
+            ) : (<IonBackButton />)} 
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+        <IonGrid>
+          <IonRow>
+            <IonCol size-sm="8" offset-sm="2" size-md="10" offset-md="1">
+              <IonGrid>
+                <IonCard>
+                  <IonRow>
+                    <IonCol>
+                      <IonItem>
+                        <IonLabel position="floating">Attribute Name</IonLabel>
+                        <IonInput
+                          key="attributeName"
+                          type="text"
+                          required
+                          placeholder="Enter Field Name"
+                          onIonChange={(event) =>
+                            onInputChangeHandler2(event, "name")
+                          }
+                          value={attribute.name}
+                        />
+                      </IonItem>
+                    </IonCol>
+                    <IonCol>
+                      <IonItem>
+                        <IonLabel position="floating">Attribute Group</IonLabel>
+                        <IonInput
+                          key="attributeGroup"
+                          required
+                          onIonChange={(event) =>
+                            onInputChangeHandler2(event, "group")
+                          }
+                          value={attribute.group}
+                        />
+                      </IonItem>
+                    </IonCol>
+                  </IonRow>
+                  <IonRow>
+                    <IonCol size-md="6" offset-md="3">
+                      <IonItem>
+                        <IonLabel position="floating">Type</IonLabel>
+                        {getOptions()}
+                      </IonItem>
+                    </IonCol>
+                  </IonRow>
+                </IonCard>
+                {selectedOption && (
+                  <DyanmicFields
+                    selectedOption={selectedOption}
+                    onChangeHandler={(event, id) =>
+                      onInputChangeHandler(event, id)
+                    }
+                  />
+                )}
+              </IonGrid>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonContent>
+      <IonFooter>
+        <IonToolbar>
+          <IonButtons slot="end">
+            <IonButton color="warning" fill="clear" onClick={onClearHandler}>
+              Clear
+            </IonButton>
+            {/* <IonButton color="success" fill="solid" onClick={onSaveHanler}> */}
+            <IonButton color="success" fill="solid" type="submit">
+              Save
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonFooter>
+      </IonPage>
+    </form>
+  );
+};
+
+const mapStateToProps = (state: any) => {
+  return {
+    attState: state,
+  };
+};
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    onAddAttribute: (attDetails: any) =>
+      dispatch(actions.add_attribute(attDetails)),
+    initAttribute: () => dispatch(actions.init_attribute()),
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(
+  React.memo(
+    AddAttributes,
+    (prevProps, nextProps) => prevProps.attState === nextProps.attState
+  )
+);

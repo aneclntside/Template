@@ -1,0 +1,16 @@
+.horizontalScroll{
+    flex-wrap: nowrap;
+    overflow-x: scroll!important;
+    overflow-y: hidden;
+  }
+.deleteButton{
+    font-size: 10px;
+}  
+.item-content:hover {
+  --ion-background-color:  transition;
+}
+.item-content {
+  --ion-background-color:  transition;
+  font-size: inherit;
+  color: #444;
+}

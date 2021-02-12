@@ -23,17 +23,25 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import Attributes from './pages/Attributes/Attributes';
+import Products from './pages/Products/Products';
+import AddAttributes from './pages/Attributes/AddAttributes';
+import AttributeBOTab from './pages/Tabs/AttributeBOTab';
+import BusinessObject from './pages/BusinessObjects/BusinessObject';
 
 const App: React.FC = () => {
 
   return (
     <IonApp>
       <IonReactRouter>
-        <IonSplitPane contentId="main">
+        <IonSplitPane disabled={false} contentId="main">
           <Menu />
           <IonRouterOutlet id="main">
-            <Route path="/page/:name" component={Page} exact />
-            <Redirect from="/" to="/page/Inbox" exact />
+            <Route path="/pim" render={() => <AttributeBOTab />}  />
+            <Route path="/products" render={() => <Products />}  />
+            {/* <Route path="/pim/:name" component={Page} exact /> */}
+            
+            <Route from="/" component={Products} exact />
           </IonRouterOutlet>
         </IonSplitPane>
       </IonReactRouter>

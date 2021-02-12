@@ -1,0 +1,9 @@
+.Invalid{
+    border-bottom: 1px solid red; 
+    border-bottom-color: salmon;
+}
+
+[class^="Invalid-"],[class*=" Invalid-"]{
+    border-bottom: 1px solid red; 
+    border-bottom-color: salmon;
+}
